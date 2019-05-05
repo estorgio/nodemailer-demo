@@ -1,5 +1,4 @@
 const nodemailer = require('nodemailer');
-require('dotenv').config();
 
 const {
   NODEMAILER_HOST,
@@ -22,10 +21,13 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-function createTemplate(options) {
+function createTemplate(templateBuilder) {
   const from = `${NODEMAILER_SENDER_NAME} <${NODEMAILER_SENDER_EMAIL}>`;
   return {
-    sendTo: async recipient => transporter.sendMail({ from, to: recipient, ...options }),
+    sendTo: async (recipient, params) => {
+      const templateOptions = templateBuilder(params);
+      transporter.sendMail({ from, to: recipient, ...templateOptions });
+    },
   };
 }
 
